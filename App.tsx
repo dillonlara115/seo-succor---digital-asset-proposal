@@ -190,6 +190,7 @@ const App: React.FC = () => {
         onRemoveItem={removeFromCart}
         isOpen={isCartOpen}
         onToggle={() => setIsCartOpen(!isCartOpen)}
+        onAcceptProposal={() => setIsAcceptModalOpen(true)}
       />
 
       <AcceptProposalModal

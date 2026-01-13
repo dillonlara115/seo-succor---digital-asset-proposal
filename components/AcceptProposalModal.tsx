@@ -83,12 +83,14 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
     try {
       // Determine API URL based on environment
       // In production: use relative URL (Vercel handles routing)
-      // In development with Vercel CLI: use localhost:3001
-      // Fallback: try relative URL first
+      // In development: try Vercel dev first, then fallback to relative
       const isDevelopment = import.meta.env.DEV;
-      const apiUrl = isDevelopment 
-        ? 'http://localhost:3001/api/submit-proposal'  // Vercel dev mode
-        : '/api/submit-proposal';  // Production or Vite preview
+      let apiUrl = '/api/submit-proposal';  // Default to relative URL
+      
+      if (isDevelopment) {
+        // In dev mode, try Vercel dev server first
+        apiUrl = 'http://localhost:3001/api/submit-proposal';
+      }
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -100,6 +102,24 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
           ...formData,
           proposalSummary
         }),
+      }).catch(async (fetchError) => {
+        // If fetch fails (CORS, network error, etc.), try relative URL as fallback
+        if (isDevelopment && fetchError.name === 'TypeError') {
+          console.warn('Vercel dev server not running, trying relative URL...');
+          const fallbackResponse = await fetch('/api/submit-proposal', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              clientName,
+              ...formData,
+              proposalSummary
+            }),
+          });
+          return fallbackResponse;
+        }
+        throw fetchError;
       });
 
       const data = await response.json();
@@ -117,7 +137,17 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
       }, 3000);
     } catch (error: any) {
       setSubmitStatus('error');
-      setErrorMessage(error.message || 'Something went wrong. Please try again.');
+      
+      // Provide helpful error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        if (import.meta.env.DEV) {
+          setErrorMessage('API server not running. Please run `vercel dev` instead of `npm run dev` to test form submission locally.');
+        } else {
+          setErrorMessage('Network error. Please check your connection and try again.');
+        }
+      } else {
+        setErrorMessage(error.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

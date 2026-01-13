@@ -7,9 +7,10 @@ interface CartProps {
   onRemoveItem: (itemId: string, type: 'pricing' | 'lease' | 'maintenance' | 'addon') => void;
   isOpen: boolean;
   onToggle: () => void;
+  onAcceptProposal: () => void;
 }
 
-const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle }) => {
+const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle, onAcceptProposal }) => {
   const parsePrice = (price: string): number => {
     // Remove $, commas, and parse
     const cleaned = price.replace(/[$,]/g, '').trim();
@@ -247,6 +248,21 @@ const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle }) => 
               </div>
             )}
           </div>
+
+          {/* Accept Proposal Button */}
+          {(oneTimeTotal > 0 || monthlyTotal > 0) && (
+            <div className="pt-4 border-t border-slate-200">
+              <button
+                onClick={() => {
+                  onAcceptProposal();
+                  onToggle(); // Close the cart when opening the accept modal
+                }}
+                className="w-full bg-slate-900 text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-slate-800 transition transform hover:scale-[1.02]"
+              >
+                Accept Proposal
+              </button>
+            </div>
+          )}
 
           {/* Empty State */}
           {totalItems === 0 && (
