@@ -184,11 +184,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                         </tr>
                         <tr>
                           <td style="padding: 8px 0; color: #6b7280;">Email:</td>
-                          <td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #2563eb; text-decoration: none;">${email}</a></td>
+                          <td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #2563eb; text-decoration: none; font-weight: 500;">${email}</a></td>
                         </tr>
                         <tr>
                           <td style="padding: 8px 0; color: #6b7280;">Phone:</td>
-                          <td style="padding: 8px 0; color: #111827;">${phone || '<span style="color: #9ca3af;">Not provided</span>'}</td>
+                          <td style="padding: 8px 0; color: #111827;">${phone ? `<a href="tel:${phone.replace(/\D/g, '')}" style="color: #2563eb; text-decoration: none; font-weight: 500;">${phone}</a>` : '<span style="color: #9ca3af;">Not provided</span>'}</td>
                         </tr>
                         ${notes ? `
                         <tr>

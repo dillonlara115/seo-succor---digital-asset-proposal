@@ -8,6 +8,23 @@ interface AcceptProposalModalProps {
   clientName: string;
 }
 
+// Helper function to format phone number as (555) 555-5555
+const formatPhoneNumber = (value: string): string => {
+  // Remove all non-digit characters
+  const phoneNumber = value.replace(/\D/g, '');
+  
+  // Format based on length
+  if (phoneNumber.length === 0) return '';
+  if (phoneNumber.length <= 3) return `(${phoneNumber}`;
+  if (phoneNumber.length <= 6) return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+  return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+};
+
+// Helper function to get clean phone number (digits only) for submission
+const getCleanPhoneNumber = (formattedPhone: string): string => {
+  return formattedPhone.replace(/\D/g, '');
+};
+
 const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -80,6 +97,10 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
       totals
     };
 
+    // Format phone number for submission (clean digits only, but formatted for display)
+    const cleanPhone = getCleanPhoneNumber(formData.phone);
+    const formattedPhone = cleanPhone ? formatPhoneNumber(cleanPhone) : '';
+
     try {
       // Determine API URL based on environment
       // In production: use relative URL (Vercel handles routing)
@@ -99,7 +120,10 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
         },
         body: JSON.stringify({
           clientName,
-          ...formData,
+          contactName: formData.contactName,
+          email: formData.email,
+          phone: formattedPhone, // Send formatted phone number
+          notes: formData.notes,
           proposalSummary
         }),
       }).catch(async (fetchError) => {
@@ -266,8 +290,13 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
                   <input
                     type="tel"
                     id="phone"
+                    placeholder="(555) 555-5555"
+                    maxLength={14}
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) => {
+                      const formatted = formatPhoneNumber(e.target.value);
+                      setFormData({ ...formData, phone: formatted });
+                    }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                   />
                 </div>
