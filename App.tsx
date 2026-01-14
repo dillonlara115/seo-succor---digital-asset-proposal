@@ -200,14 +200,17 @@ const App: React.FC = () => {
         clientName={data.clientName}
       />
 
-      <div className="fixed bottom-6 right-6 z-40 flex space-x-3 print:hidden">
+      <div className="fixed bottom-6 right-4 sm:right-6 z-40 flex flex-col sm:flex-row gap-3 print:hidden">
         <button 
           onClick={() => setIsAcceptModalOpen(true)}
-          className="bg-slate-900 text-white px-6 py-3 rounded-full font-bold shadow-xl hover:bg-slate-800 transition transform hover:scale-105"
+          className="bg-slate-900 text-white px-4 sm:px-6 py-3 rounded-full font-bold shadow-xl hover:bg-slate-800 transition transform hover:scale-105 text-sm sm:text-base whitespace-nowrap"
         >
           Accept Proposal
         </button>
-        <button className="bg-white text-slate-900 border border-slate-200 px-6 py-3 rounded-full font-bold shadow-xl hover:bg-slate-50 transition transform hover:scale-105" onClick={() => window.print()}>
+        <button 
+          className="bg-white text-slate-900 border border-slate-200 px-4 sm:px-6 py-3 rounded-full font-bold shadow-xl hover:bg-slate-50 transition transform hover:scale-105 text-sm sm:text-base whitespace-nowrap" 
+          onClick={() => window.print()}
+        >
           Download PDF
         </button>
       </div>

@@ -73,12 +73,13 @@ const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle, onAcc
       {totalItems > 0 && (
         <button
           onClick={onToggle}
-          className={`fixed bottom-6 left-6 z-50 bg-brand-primary text-white px-6 py-3 rounded-full font-bold shadow-xl hover:bg-brand-primary/90 transition transform hover:scale-105 flex items-center gap-2 print:hidden ${
+          className={`fixed bottom-6 left-4 sm:left-6 z-50 bg-brand-primary text-white px-4 sm:px-6 py-3 rounded-full font-bold shadow-xl hover:bg-brand-primary/90 transition transform hover:scale-105 flex items-center gap-2 print:hidden text-sm sm:text-base ${
             isOpen ? 'opacity-0 pointer-events-none' : ''
           }`}
         >
-          <span>View Quote</span>
-          <span className="bg-white text-brand-primary rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">
+          <span className="hidden sm:inline">View Quote</span>
+          <span className="sm:hidden">Quote</span>
+          <span className="bg-white text-brand-primary rounded-full w-6 h-6 flex items-center justify-center text-xs font-black flex-shrink-0">
             {totalItems}
           </span>
         </button>
@@ -120,7 +121,7 @@ const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle, onAcc
           {/* Pricing Plan */}
           {cart.pricingPlan && (
                 <div className="border border-slate-200 rounded-xl p-4">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <p className="font-bold text-slate-900">{cart.pricingPlan.name}</p>
                       <p className="text-sm text-slate-500 mt-1">One-time payment</p>
@@ -133,6 +134,19 @@ const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle, onAcc
                       >
                         Remove
                       </button>
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 mt-3">
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Payment Schedule:</p>
+                    <div className="space-y-1 text-xs text-slate-600">
+                      <div className="flex justify-between">
+                        <span>50% Down Payment:</span>
+                        <span className="font-semibold">${Math.round(parsePrice(cart.pricingPlan.price) * 0.5).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>50% Upon Completion:</span>
+                        <span className="font-semibold">${Math.round(parsePrice(cart.pricingPlan.price) * 0.5).toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -240,12 +254,29 @@ const Cart: React.FC<CartProps> = ({ cart, onRemoveItem, isOpen, onToggle, onAcc
               </>
             )}
             {(oneTimeTotal > 0 || monthlyTotal > 0) && (
-              <div className="border-t border-slate-300 pt-4 flex justify-between">
-                <span className="text-lg font-bold text-slate-900">Grand Total (First Year)</span>
-                <span className="text-lg font-black text-brand-primary">
-                  ${(oneTimeTotal + annualTotal).toLocaleString()}
-                </span>
-              </div>
+              <>
+                <div className="border-t border-slate-300 pt-4 flex justify-between">
+                  <span className="text-lg font-bold text-slate-900">Grand Total (First Year)</span>
+                  <span className="text-lg font-black text-brand-primary">
+                    ${(oneTimeTotal + annualTotal).toLocaleString()}
+                  </span>
+                </div>
+                {oneTimeTotal > 0 && cart.pricingPlan && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mt-4">
+                    <p className="text-sm font-semibold text-slate-700 mb-2">Payment Schedule:</p>
+                    <div className="space-y-2 text-sm text-slate-600">
+                      <div className="flex justify-between">
+                        <span>50% Down Payment:</span>
+                        <span className="font-semibold text-slate-900">${Math.round(oneTimeTotal * 0.5).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>50% Upon Completion:</span>
+                        <span className="font-semibold text-slate-900">${Math.round(oneTimeTotal * 0.5).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

@@ -34,11 +34,23 @@ const tiers: PricingTier[] = [
 ];
 
 const Pricing: React.FC<PricingProps> = ({ cart, onAddToCart }) => {
+  // Calculate discounted price (10% off for current clients)
+  const getDiscountedPrice = (originalPrice: string): { original: number; discounted: number; discountedPrice: string } => {
+    const price = parseFloat(originalPrice.replace(/[$,]/g, ''));
+    const discounted = price * 0.9; // 10% discount
+    return {
+      original: price,
+      discounted: discounted,
+      discountedPrice: `$${Math.round(discounted).toLocaleString()}`
+    };
+  };
+
   const handleSelectPlan = (tier: PricingTier) => {
+    const pricing = getDiscountedPrice(tier.price);
     const cartItem: CartItem = {
       id: `pricing-${tier.name.toLowerCase().replace(/\s+/g, '-')}`,
       name: tier.name,
-      price: tier.price,
+      price: pricing.discountedPrice, // Use discounted price
       type: 'pricing',
       recurring: false
     };
@@ -64,6 +76,7 @@ const Pricing: React.FC<PricingProps> = ({ cart, onAddToCart }) => {
         {tiers.map((tier, idx) => {
           const itemId = `pricing-${tier.name.toLowerCase().replace(/\s+/g, '-')}`;
           const isSelected = cart.pricingPlan?.id === itemId;
+          const pricing = getDiscountedPrice(tier.price);
           
           return (
             <div 
@@ -88,11 +101,19 @@ const Pricing: React.FC<PricingProps> = ({ cart, onAddToCart }) => {
               )}
               <div className="mb-8">
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">{tier.name}</h3>
-                <div className="flex items-baseline space-x-2">
-                  <span className="text-4xl font-black text-slate-900">{tier.price}</span>
+                <div className="flex items-baseline space-x-2 mb-2">
+                  <span className="text-4xl font-black text-slate-900">{pricing.discountedPrice}</span>
                   <span className="text-slate-400 font-medium italic">USD</span>
                 </div>
-                <p className="mt-4 text-slate-500 text-sm leading-relaxed">{tier.description}</p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm text-slate-400 line-through">{tier.price}</span>
+                  <span className="text-xs bg-brand-primary/10 text-brand-primary px-2 py-1 rounded-full font-bold">10% Current Client Discount</span>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4">
+                  <p className="text-xs font-semibold text-slate-700 mb-1">Payment Terms:</p>
+                  <p className="text-xs text-slate-600">50% down payment • 50% due upon completion</p>
+                </div>
+                <p className="mt-2 text-slate-500 text-sm leading-relaxed">{tier.description}</p>
               </div>
               
               <ul className="flex-grow space-y-4 mb-8">
