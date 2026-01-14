@@ -33,9 +33,9 @@ const Hero: React.FC<HeroProps> = ({ data, isGenerating }) => {
             <div className="prose prose-lg text-slate-600 max-w-none whitespace-pre-line leading-relaxed italic">
               {data.generatedSummary || `Your current online presence is a cost center, not an engine. Specifically, ${data.coreProblem}. 
 
-              We aren't just "building a website." We are constructing a high-performance, SEO-native digital platform designed to own the local therapy market in Baltimore. 
+              We aren't just "building a website." We are constructing improved CRO that amplifies local SEO wins. 
 
-              The outcome? A site that Google loves, patients trust, and your competitors fear. Faster load times, superior ranking capability, and higher patient conversion rates.`}
+              The outcome? Faster load times, bug fixes that eliminate user friction, and other conversion optimization improvements that ensure your local SEO victories translate into actual patient bookings.`}
             </div>
           )}
           
