@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Resend } from 'resend';
+import { supabaseAdmin } from '../../lib/supabase-admin';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -137,12 +138,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       email, 
       phone, 
       notes, 
-      proposalSummary 
+      proposalSummary,
+      proposalId 
     } = req.body;
 
     // Validate required fields
     if (!clientName || !contactName || !email) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Save submission to database if proposalId is provided
+    let submissionId = null;
+    if (proposalId) {
+      try {
+        const { data: submission, error: submissionError } = await supabaseAdmin
+          .from('proposal_submissions')
+          .insert({
+            proposal_id: proposalId,
+            contact_name: contactName,
+            email: email,
+            phone: phone || null,
+            notes: notes || null,
+          })
+          .select()
+          .single();
+
+        if (!submissionError && submission) {
+          submissionId = submission.id;
+
+          // Update proposal status to 'accepted'
+          await supabaseAdmin
+            .from('proposals')
+            .update({
+              status: 'accepted',
+              accepted_at: new Date().toISOString(),
+            })
+            .eq('id', proposalId);
+        }
+      } catch (dbError) {
+        console.error('Error saving submission to database:', dbError);
+        // Continue with email sending even if DB save fails
+      }
     }
 
     // Email to your team

@@ -1,11 +1,46 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Testimonial } from '../types';
 
 interface SocialProofProps {
   clientName: string;
 }
 
 const SocialProof: React.FC<SocialProofProps> = ({ clientName }) => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTestimonials = async () => {
+      try {
+        const response = await fetch('/api/admin/testimonials');
+        if (response.ok) {
+          const data = await response.json();
+          const active = data.filter((t: Testimonial) => t.is_active);
+          setTestimonials(active);
+        }
+      } catch (error) {
+        console.error('Failed to load testimonials:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTestimonials();
+  }, []);
+
+  // Fallback testimonial if API fails or no testimonials
+  const defaultTestimonial = {
+    name: 'Josh Traeger',
+    role: 'Founder',
+    company: 'The Military Defense Firm',
+    quote: "I have trusted SEO Succor to help me build two different businesses, both of which have thrived under their guidance. Most recently, my legal business -- which operates worldwide -- has seen an increase in web traffic by at least 1000%, an overwhelming increase in leads, and significantly more qualified leads than we've ever had before. All of this in just twelve months of work! The team at SEO Succor is honest, dependable, organized, and highly knowledgeable. If your business depends on web traffic for lead generation, look no further -- this is the team for you.",
+    rating: 5,
+  };
+
+  const displayTestimonials = testimonials.length > 0 ? testimonials : [defaultTestimonial as Testimonial];
+  const firstTestimonial = displayTestimonials[0];
+
   return (
     <section className="space-y-24">
       {/* Testimonial Section */}
@@ -24,18 +59,30 @@ const SocialProof: React.FC<SocialProofProps> = ({ clientName }) => {
           
           <div className="relative z-10">
             <div className="flex space-x-1 mb-8">
-              {[1, 2, 3, 4, 5].map(s => (
+              {Array.from({ length: firstTestimonial.rating || 5 }).map((_, s) => (
                 <span key={s} className="text-yellow-400 text-xl">★</span>
               ))}
             </div>
             <p className="text-2xl font-medium text-slate-700 italic leading-relaxed mb-10 max-w-4xl">
-              "I have trusted SEO Succor to help me build two different businesses, both of which have thrived under their guidance. Most recently, my legal business -- which operates worldwide -- has seen an increase in web traffic by at least 1000%, an overwhelming increase in leads, and significantly more qualified leads than we've ever had before. All of this in just twelve months of work! The team at SEO Succor is honest, dependable, organized, and highly knowledgeable. If your business depends on web traffic for lead generation, look no further -- this is the team for you."
+              "{firstTestimonial.quote}"
             </p>
             <div className="flex items-center space-x-6 border-t border-slate-100 pt-8">
-              <div className="w-16 h-16 rounded-full bg-brand-primary flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-primary/20">JT</div>
+              {firstTestimonial.image_url ? (
+                <img 
+                  src={firstTestimonial.image_url} 
+                  alt={firstTestimonial.name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-brand-primary"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-brand-primary flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-primary/20">
+                  {firstTestimonial.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                </div>
+              )}
               <div>
-                <p className="font-bold text-xl text-slate-900">Josh Traeger</p>
-                <p className="text-sm text-slate-500 uppercase font-black tracking-widest mt-1">Founder, The Military Defense Firm</p>
+                <p className="font-bold text-xl text-slate-900">{firstTestimonial.name}</p>
+                <p className="text-sm text-slate-500 uppercase font-black tracking-widest mt-1">
+                  {firstTestimonial.role}{firstTestimonial.company ? `, ${firstTestimonial.company}` : ''}
+                </p>
               </div>
             </div>
           </div>

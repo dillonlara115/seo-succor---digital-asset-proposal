@@ -6,6 +6,7 @@ interface AcceptProposalModalProps {
   onClose: () => void;
   cart: Cart;
   clientName: string;
+  proposalId?: string | null;
 }
 
 // Helper function to format phone number as (555) 555-5555
@@ -29,7 +30,8 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
   isOpen, 
   onClose, 
   cart,
-  clientName 
+  clientName,
+  proposalId 
 }) => {
   const [formData, setFormData] = useState({
     contactName: '',
@@ -124,7 +126,8 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
           email: formData.email,
           phone: formattedPhone, // Send formatted phone number
           notes: formData.notes,
-          proposalSummary
+          proposalSummary,
+          proposalId: proposalId || undefined
         }),
       }).catch(async (fetchError) => {
         // If fetch fails (CORS, network error, etc.), try relative URL as fallback
@@ -138,7 +141,8 @@ const AcceptProposalModal: React.FC<AcceptProposalModalProps> = ({
             body: JSON.stringify({
               clientName,
               ...formData,
-              proposalSummary
+              proposalSummary,
+              proposalId: proposalId || undefined
             }),
           });
           return fallbackResponse;
